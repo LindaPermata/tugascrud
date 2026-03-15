@@ -1,75 +1,41 @@
 package com.example.tugascrud.controller;
 
 import com.example.tugascrud.model.dto.KtpAddRequest;
-import com.example.tugascrud.model.dto.KtpDto;
 import com.example.tugascrud.service.KtpService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-
 @RestController
-@RequestMapping("/api/ktp")
-@RequiredArgsConstructor
+@RequestMapping("/ktp")
 public class KtpController {
 
-    private final KtpService ktpService;
+    @Autowired
+    private KtpService ktpService;
 
-    @PostMapping(
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<Map<String, Object>> addKtp(@RequestBody KtpAddRequest request) {
-        KtpDto result = ktpService.addKtp(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
-                "status", "success",
-                "data", result
-        ));
+    @PostMapping
+    public Object add(@RequestBody KtpAddRequest request){
+        return ktpService.add(request);
     }
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> getAllKtp() {
-        List<KtpDto> result = ktpService.getAllKtp();
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of(
-                "status", "success",
-                "data", result
-        ));
+    @GetMapping
+    public Object getAll(){
+        return ktpService.getAll();
     }
 
-    @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> getKtpById(@PathVariable("id") Integer id) {
-        KtpDto result = ktpService.getKtpById(id);
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of(
-                "status", "success",
-                "data", result
-        ));
+    @GetMapping("/{id}")
+    public Object getById(@PathVariable Integer id){
+        return ktpService.getById(id);
     }
 
-    @PutMapping(
-            path = "/{id}",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<Map<String, Object>> updateKtp(
-            @PathVariable("id") Integer id,
-            @RequestBody KtpAddRequest request
-    ) {
-        KtpDto result = ktpService.updateKtp(id, request);
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of(
-                "status", "success",
-                "data", result
-        ));
+    @PutMapping("/{id}")
+    public Object update(@PathVariable Integer id,
+                         @RequestBody KtpAddRequest request){
+        return ktpService.update(id, request);
     }
 
-    @DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> deleteKtp(@PathVariable("id") Integer id) {
-        ktpService.deleteKtp(id);
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of(
-                "status", "success delete ktp with id " + id
-        ));
+    @DeleteMapping("/{id}")
+    public Object delete(@PathVariable Integer id){
+        ktpService.delete(id);
+        return "Data berhasil dihapus";
     }
 }

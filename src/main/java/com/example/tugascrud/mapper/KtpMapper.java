@@ -1,14 +1,19 @@
 package com.example.tugascrud.mapper;
 
+
+import com.example.tugascrud.model.dto.KtpAddRequest;
 import com.example.tugascrud.model.dto.KtpDto;
-import com.example.tugascrud.model.entity.KtpEntity;
+import com.example.tugascrud.model.entity.Ktp;
 import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface KtpMapper {
 
-    KtpDto toKtpDto(KtpEntity entity);
+    KtpMapper INSTANCE = Mappers.getMapper(KtpMapper.class);
 
-    KtpEntity toKtpEntity(KtpDto dto);
+    KtpDto toDto(Ktp ktp);
+
+    Ktp toEntity(KtpAddRequest request);
 
 }

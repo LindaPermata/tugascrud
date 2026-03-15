@@ -1,86 +1,87 @@
 package com.example.tugascrud.service.Impl;
 
+
 import com.example.tugascrud.mapper.KtpMapper;
 import com.example.tugascrud.model.dto.KtpAddRequest;
 import com.example.tugascrud.model.dto.KtpDto;
-import com.example.tugascrud.model.entity.KtpEntity;
+import com.example.tugascrud.model.entity.Ktp;
 import com.example.tugascrud.repository.KtpRepository;
-import com.example.tugascrud.util.ValidationUtil;
 import com.example.tugascrud.service.KtpService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import com.example.tugascrud.util.ValidationUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class KtpServiceImpl implements KtpService {
 
-    private final KtpRepository ktpRepository;
-    private final ValidationUtil validationUtil;
-    private final KtpMapper ktpMapper;
+    @Autowired
+    private KtpRepository ktpRepository;
 
-    @Transactional
+    @Autowired
+    private KtpMapper ktpMapper;
+
     @Override
-    public KtpDto addKtp(KtpAddRequest request) {
-        validationUtil.validate(request);
+    public KtpDto add(KtpAddRequest request) {
 
-        if (ktpRepository.existsByNomorKtp(request.getNomorKtp())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nomor KTP sudah terdaftar");
+        ValidationUtil.validate(request);
+
+        if(ktpRepository.findByNomorKtp(request.getNomorKtp()).isPresent()){
+            throw new RuntimeException("Nomor KTP sudah ada");
         }
 
-        KtpEntity entity = KtpEntity.builder()
-                .nomorKtp(request.getNomorKtp())
-                .namaLengkap(request.getNamaLengkap())
-                .alamat(request.getAlamat())
-                .tanggalLahir(LocalDate.parse(request.getTanggalLahir()))
-                .jenisKelamin(request.getJenisKelamin())
-                .build();
+        Ktp ktp = ktpMapper.toEntity(request);
 
-        return ktpMapper.toKtpDto(ktpRepository.save(entity));
+        ktpRepository.save(ktp);
+
+        return ktpMapper.toDto(ktp);
     }
 
     @Override
-    public List<KtpDto> getAllKtp() {
-        return ktpRepository.findAll().stream()
-                .map(ktpMapper::toKtpDto)
+    public List<KtpDto> getAll() {
+
+        return ktpRepository.findAll()
+                .stream()
+                .map(ktpMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public KtpDto getKtpById(Integer id) {
-        KtpEntity entity = ktpRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "KTP dengan ID " + id + " tidak ditemukan"));
-        return ktpMapper.toKtpDto(entity);
+    public KtpDto getById(Integer id) {
+
+        Ktp ktp = ktpRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Data tidak ditemukan"));
+
+        return ktpMapper.toDto(ktp);
     }
 
-    @Transactional
     @Override
-    public KtpDto updateKtp(Integer id, KtpAddRequest request) {
-        validationUtil.validate(request);
+    public KtpDto update(Integer id, KtpAddRequest request) {
 
-        KtpEntity existing = ktpRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "KTP tidak ditemukan"));
+        ValidationUtil.validate(request);
 
-        existing.setNomorKtp(request.getNomorKtp());
-        existing.setNamaLengkap(request.getNamaLengkap());
-        existing.setAlamat(request.getAlamat());
-        existing.setTanggalLahir(LocalDate.parse(request.getTanggalLahir()));
-        existing.setJenisKelamin(request.getJenisKelamin());
+        Ktp ktp = ktpRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Data tidak ditemukan"));
 
-        return ktpMapper.toKtpDto(ktpRepository.save(existing));
+        ktp.setNomorKtp(request.getNomorKtp());
+        ktp.setNamaLengkap(request.getNamaLengkap());
+        ktp.setAlamat(request.getAlamat());
+        ktp.setTanggalLahir(request.getTanggalLahir());
+        ktp.setJenisKelamin(request.getJenisKelamin());
+
+        ktpRepository.save(ktp);
+
+        return ktpMapper.toDto(ktp);
     }
 
-    @Transactional
     @Override
-    public void deleteKtp(Integer id) {
-        KtpEntity entity = ktpRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "KTP tidak ditemukan"));
-        ktpRepository.delete(entity);
+    public void delete(Integer id) {
+
+        Ktp ktp = ktpRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Data tidak ditemukan"));
+
+        ktpRepository.delete(ktp);
     }
 }

@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class KtpEntity {
+public class Ktp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

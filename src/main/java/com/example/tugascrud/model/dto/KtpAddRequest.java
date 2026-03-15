@@ -3,11 +3,15 @@ package com.example.tugascrud.model.dto;
 
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Data
 public class KtpAddRequest {
+
     private String nomorKtp;
     private String namaLengkap;
     private String alamat;
-    private String tanggalLahir; // Format yyyy-MM-dd
+    private LocalDate tanggalLahir;
     private String jenisKelamin;
+
 }

@@ -3,22 +3,24 @@ package com.example.tugascrud.util;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
 @Component
-@RequiredArgsConstructor
 public class ValidationUtil {
 
-    private final Validator validator;
+    private static Validator validator;
 
-    public void validate(Object request) {
-        Set<ConstraintViolation<Object>> constraintViolations = validator.validate(request);
+    @Autowired
+    public ValidationUtil(Validator validator){
+        ValidationUtil.validator = validator;
+    }
 
-
-        if (!constraintViolations.isEmpty()) {
+    public static void validate(Object object){
+        Set<ConstraintViolation<Object>> constraintViolations = validator.validate(object);
+        if(constraintViolations.size() != 0){
             throw new ConstraintViolationException(constraintViolations);
         }
     }
